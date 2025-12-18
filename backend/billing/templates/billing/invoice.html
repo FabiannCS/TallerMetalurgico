@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Proforma {{ proforma.id }}</title>
+    <style>
+        @page { size: Letter; margin: 1cm; }
+        body { font-family: sans-serif; font-size: 12px; color: #333; }
+        .header { width: 100%; margin-bottom: 20px; border-bottom: 2px solid #004aad; padding-bottom: 10px; }
+        .logo-area { width: 60%; display: inline-block; vertical-align: top; }
+        .logo-title { font-size: 24px; font-weight: bold; color: #004aad; text-transform: uppercase; }
+        .proforma-box { width: 35%; display: inline-block; vertical-align: top; text-align: right; }
+        .box-number { border: 2px solid #004aad; padding: 10px; border-radius: 8px; color: #d00; font-size: 18px; font-weight: bold; }
+        
+        .info-table { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+        .info-table td { padding: 5px; border: 1px solid #ccc; }
+        .label { font-weight: bold; background-color: #f0f4f8; width: 15%; }
+
+        .items-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .items-table th { background-color: #004aad; color: white; padding: 8px; text-align: left; }
+        .items-table td { border: 1px solid #ddd; padding: 8px; }
+        .text-right { text-align: right; }
+        
+        .footer { margin-top: 30px; border-top: 1px solid #000; padding-top: 10px; font-size: 10px; text-align: center; }
+        .total-section { float: right; width: 30%; margin-top: 10px; font-size: 14px; }
+        .total-row { font-weight: bold; border-top: 2px solid #004aad; padding-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <div class="logo-title">Taller Metalúrgico<br>VALLEGRANDE</div>
+            <div>De: Segundo Vargas y Flia.</div>
+            <div>Telf: 392-25501 • Cel: 708-98326</div>
+            <div>Dir: Guabira (Villa Fátima) Carretera a Saavedra</div>
+            <div>Montero - Santa Cruz - Bolivia</div>
+        </div>
+        <div class="proforma-box">
+            <div class="box-number">PRO-FORMA Nº {{ proforma.id|stringformat:"06d" }}</div>
+            <br>
+            <strong>Fecha:</strong> {{ proforma.created_at|date:"d/m/Y" }}
+        </div>
+    </div>
+
+    <table class="info-table">
+        <tr>
+            <td class="label">Señor(es):</td>
+            <td colspan="3">{{ proforma.client.name }}</td>
+        </tr>
+        <tr>
+            <td class="label">Vehículo:</td>
+            <td>{{ proforma.vehicle_ref }}</td>
+            <td class="label">Celular:</td>
+            <td>{{ proforma.client.phone|default:"-" }}</td>
+        </tr>
+        <tr>
+            <td class="label">Chofer:</td>
+            <td colspan="3">{{ proforma.driver|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <table class="items-table">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Cant.</th>
+                <th style="width: 60%;">Descripción</th>
+                <th style="width: 15%;" class="text-right">P. Unit.</th>
+                <th style="width: 15%;" class="text-right">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in proforma.items.all %}
+            <tr>
+                <td style="text-align: center;">{{ item.quantity }}</td>
+                <td>{{ item.description }}</td>
+                <td class="text-right">{{ item.unit_price }}</td>
+                <td class="text-right">{{ item.subtotal }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <div style="float: left; width: 65%; font-size: 11px; font-weight: bold; background-color: #f0f4f8; padding: 10px; border-radius: 5px;">
+            SON: {{ literal_amount }}
+        </div>
+
+        <div style="float: right; width: 30%;">
+            <div class="total-row text-right" style="font-size: 16px;">
+                TOTAL Bs: {{ proforma.total }}
+            </div>
+        </div>
+        
+        <div style="clear: both;"></div>
+    </div>
+
+    <div class="footer">
+        Este documento es una Pro-Forma de presupuesto, no tiene valor fiscal. <br>
+        Validez de la oferta: 15 días.
+    </div>
+</body>
+</html>
